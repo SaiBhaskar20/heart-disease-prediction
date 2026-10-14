@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="{{ 'te' if lang == 'te' else 'en' }}">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Educational heart-health machine-learning demonstration; not a medical diagnosis.">
+<title>{{ t.page_title }}</title>
+<style>
+:root{--ink:#18302f;--muted:#627573;--brand:#087f70;--line:#dce8e5;--bg:#f3f8f7;--danger:#9f2727}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,"Noto Sans Telugu","Nirmala UI",Arial,sans-serif}
+header{background:linear-gradient(120deg,#075f57,#119987);color:white;text-align:center;padding:30px 16px}header h1{margin:8px 0;font-size:clamp(1.8rem,4vw,2.5rem)}header p{margin:auto;max-width:720px;color:#e5fffa}
+main{max-width:1100px;margin:24px auto;padding:0 16px 36px}.topbar{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:14px}.topbar label{font-weight:700}.topbar select{width:auto;min-width:145px}
+.notice{background:#fff8e7;border:1px solid #f0d99c;border-radius:12px;padding:14px;margin-bottom:18px;color:#604b16}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 34px #153f3910;overflow:hidden}.panel-head{padding:20px 24px;border-bottom:1px solid var(--line)}.panel-head h2{margin:0}.panel-head p{margin:5px 0 0;color:var(--muted);font-size:.92rem}
+form{padding:24px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.field label{display:block;font-weight:700;font-size:.92rem;margin-bottom:7px}
+input,select{width:100%;min-height:45px;border:1px solid #cbdad7;border-radius:10px;background:#fff;padding:10px 12px;color:var(--ink);font:inherit}input:focus,select:focus{outline:3px solid #0c99852b;border-color:var(--brand)}
+.errors{background:#fff0f0;color:var(--danger);border:1px solid #f0c7c7;border-radius:12px;padding:12px 18px;margin-bottom:20px}.errors ul{margin:5px 0 0;padding-left:22px}
+.actions{margin-top:24px}.submit{border:0;border-radius:11px;padding:13px 22px;background:var(--brand);color:white;font:inherit;font-weight:800;cursor:pointer}.submit:hover{background:#06675c}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:20px}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.grid{grid-template-columns:1fr}form{padding:17px}.panel-head{padding:18px}}
+</style></head>
+<body>
+<header><div>{{ t.demo }}</div><h1>{{ t.page_title }}</h1><p>{{ t.subtitle }}</p></header>
+<main>
+<div class="topbar"><label for="language">{{ t.language }}</label><select id="language" onchange="window.location.href='/?lang='+this.value"><option value="en" {% if lang == 'en' %}selected{% endif %}>English</option><option value="te" {% if lang == 'te' %}selected{% endif %}>తెలుగు</option></select></div>
+<div class="notice"><strong>{{ t.notice_title }}</strong> {{ t.notice }}</div>
+<section class="panel"><div class="panel-head"><h2>{{ t.form_title }}</h2><p>{{ t.form_subtitle }}</p></div>
+<form action="{{ url_for('predict') }}" method="post">
+<input type="hidden" name="lang" value="{{ lang }}">
+{% if errors %}<div class="errors" role="alert"><strong>{{ t.review }}</strong><ul>{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul></div>{% endif %}
+<div class="grid">
+<div class="field"><label for="age">{{ t.age }}</label><input id="age" name="age" type="number" min="1" max="120" value="{{ form_data.get('age','') }}" required></div>
+<div class="field"><label for="gender">{{ t.gender }}</label><select id="gender" name="gender" required><option value="0" {% if form_data.get('gender','0') == '0' %}selected{% endif %}>{{ t.female }}</option><option value="1" {% if form_data.get('gender') == '1' %}selected{% endif %}>{{ t.male }}</option></select></div>
+<div class="field"><label for="cholesterol">{{ t.cholesterol }}</label><input id="cholesterol" name="cholesterol" type="number" min="0" max="1000" value="{{ form_data.get('cholesterol','') }}" required></div>
+<div class="field"><label for="bp">{{ t.bp }}</label><input id="bp" name="bp" type="number" min="0" max="400" value="{{ form_data.get('bp','') }}" required></div>
+<div class="field"><label for="heart_rate">{{ t.heart_rate }}</label><input id="heart_rate" name="heart_rate" type="number" min="0" max="300" value="{{ form_data.get('heart_rate','') }}" required></div>
+<div class="field"><label for="smoking">{{ t.smoking }}</label><select id="smoking" name="smoking" required><option value="">{{ t.choose }}</option>{% for value,label in [('Never',t.never),('Former',t.former),('Current',t.current)] %}<option value="{{ value }}" {% if form_data.get('smoking') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+<div class="field"><label for="alcohol">{{ t.alcohol }}</label><select id="alcohol" name="alcohol" required><option value="">{{ t.choose }}</option>{% for value,label in [('No',t.no),('Moderate',t.moderate),('Heavy',t.heavy)] %}<option value="{{ value }}" {% if form_data.get('alcohol') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+<div class="field"><label for="exercise_hours">{{ t.exercise_hours }}</label><input id="exercise_hours" name="exercise_hours" type="number" min="0" max="168" value="{{ form_data.get('exercise_hours','') }}" required></div>
+<div class="field"><label for="family_history">{{ t.family_history }}</label><select id="family_history" name="family_history" required><option value="0" {% if form_data.get('family_history','0') == '0' %}selected{% endif %}>{{ t.no }} (0)</option><option value="1" {% if form_data.get('family_history') == '1' %}selected{% endif %}>{{ t.yes }} (1)</option></select></div>
+<div class="field"><label for="diabetes">{{ t.diabetes }}</label><select id="diabetes" name="diabetes" required><option value="0" {% if form_data.get('diabetes','0') == '0' %}selected{% endif %}>{{ t.no }} (0)</option><option value="1" {% if form_data.get('diabetes') == '1' %}selected{% endif %}>{{ t.yes }} (1)</option></select></div>
+<div class="field"><label for="obesity">{{ t.obesity }}</label><select id="obesity" name="obesity" required><option value="0" {% if form_data.get('obesity','0') == '0' %}selected{% endif %}>{{ t.no }} (0)</option><option value="1" {% if form_data.get('obesity') == '1' %}selected{% endif %}>{{ t.yes }} (1)</option></select></div>
+<div class="field"><label for="stress">{{ t.stress }}</label><input id="stress" name="stress" type="number" min="0" max="10" value="{{ form_data.get('stress','') }}" required></div>
+<div class="field"><label for="blood_sugar">{{ t.blood_sugar }}</label><input id="blood_sugar" name="blood_sugar" type="number" min="0" max="1000" value="{{ form_data.get('blood_sugar','') }}" required></div>
+<div class="field"><label for="exercise_angina">{{ t.exercise_angina }}</label><select id="exercise_angina" name="exercise_angina" required><option value="">{{ t.choose }}</option>{% for value,label in [('No',t.no),('Yes',t.yes)] %}<option value="{{ value }}" {% if form_data.get('exercise_angina') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+<div class="field"><label for="chest_pain">{{ t.chest_pain }}</label><select id="chest_pain" name="chest_pain" required><option value="">{{ t.choose }}</option>{% for value,label in [('Typical Angina',t.typical),('Atypical Angina',t.atypical),('Non-anginal Pain',t.non_anginal),('Asymptomatic',t.asymptomatic)] %}<option value="{{ value }}" {% if form_data.get('chest_pain') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+</div><div class="actions"><button class="submit" type="submit">{{ t.run }}</button></div>
+</form></section></main><footer>{{ t.footer }}</footer></body></html>
